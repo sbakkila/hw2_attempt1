@@ -1,4 +1,3 @@
-var path = require('path');
 var autoprefixer = require('autoprefixer');
 var postcssNested = require('postcss-nested');
 var webpack = require('webpack');
