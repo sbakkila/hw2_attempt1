@@ -13,6 +13,9 @@ process.env.HOST = process.env.HOST || 'localhost';
 // default PORT to 3000
 process.env.PORT = process.env.PORT || 3000;
 
+// default APIPORT to 3001
+process.env.APIPORT = process.env.APIPORT || 3001;
+
 // enable ES6 in subsequent files
 require('babel-core/register');
 

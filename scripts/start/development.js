@@ -18,7 +18,7 @@ if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
 }
 
 // Tools like Cloud9 rely on this.
-var compiler;
+let compiler;
 
 function setupCompiler(host, port, protocol) {
   // "Compiler" is a low-level interface to Webpack.
@@ -49,10 +49,6 @@ function setupCompiler(host, port, protocol) {
       console.log('The app is running at:');
       console.log();
       console.log('  ' + chalk.cyan(protocol + '://' + host + ':' + port + '/'));
-      console.log();
-      console.log('Note that the development build is not optimized.');
-      console.log('To create a production build, use ' + chalk.cyan('npm run build') + '.');
-      console.log();
     }
 
     // If errors exist, only show errors.
@@ -86,7 +82,7 @@ function setupCompiler(host, port, protocol) {
 // It allows us to log custom error messages on the console.
 function onProxyError(proxy) {
   return function(err, req, res){
-    var host = req.headers && req.headers.host;
+    const host = req.headers && req.headers.host;
     console.log(
       chalk.red('Proxy error:') + ' Could not proxy request ' + chalk.cyan(req.url) +
       ' from ' + chalk.cyan(host) + ' to ' + chalk.cyan(proxy) + '.'
@@ -102,16 +98,17 @@ function onProxyError(proxy) {
     if (res.writeHead && !res.headersSent) {
         res.writeHead(500);
     }
-    res.end('Proxy error: Could not proxy request ' + req.url + ' from ' +
-      host + ' to ' + proxy + ' (' + err.code + ').'
+    res.end(
+      `Proxy error: Could not proxy request ${req.url} from ${host} to ${proxy} (${err.code}).`
     );
   }
 }
 
+// proxy routes beginning with API
+const mayProxy = /^\/api\/.*$/;
+const apiUrl = `${process.env.HTTPS ? 'https' : 'http'}://${process.env.HOST}:${process.env.APIPORT}`;
+
 function addMiddleware(devServer) {
-  // `proxy` lets you to specify a fallback server during development.
-  // Every unrecognized request will be forwarded to it.
-  var proxy = require(paths.appPackageJson).proxy;
   devServer.use(historyApiFallback({
     // Paths with dots should still use the history fallback.
     // See https://github.com/facebookincubator/create-react-app/issues/387.
@@ -123,32 +120,20 @@ function addMiddleware(devServer) {
     // Modern browsers include text/html into `accept` header when navigating.
     // However API calls like `fetch()` won’t generally accept text/html.
     // If this heuristic doesn’t work well for you, don’t use `proxy`.
-    htmlAcceptHeaders: proxy ?
-      ['text/html'] :
-      ['text/html', '*/*']
+    htmlAcceptHeaders: ['text/html']
   }));
-  if (proxy) {
-    if (typeof proxy !== 'string') {
-      console.log(chalk.red('When specified, "proxy" in package.json must be a string.'));
-      console.log(chalk.red('Instead, the type of "proxy" was "' + typeof proxy + '".'));
-      console.log(chalk.red('Either remove "proxy" from package.json, or make it a string.'));
-      process.exit(1);
-    }
 
-    // proxy routes beginning with API
-    var mayProxy = /^\/api\/.*$/;
-    devServer.use(mayProxy,
-      // Pass the scope regex both to Express and to the middleware for proxying
-      // of both HTTP and WebSockets to work without false positives.
-      httpProxyMiddleware(pathname => mayProxy.test(pathname), {
-        target: proxy,
-        logLevel: 'silent',
-        onError: onProxyError(proxy),
-        secure: false,
-        changeOrigin: true
-      })
-    );
-  }
+  devServer.use(mayProxy,
+    // Pass the scope regex both to Express and to the middleware for proxying
+    // of both HTTP and WebSockets to work without false positives.
+    httpProxyMiddleware(pathname => mayProxy.test(pathname), {
+      target: apiUrl,
+      logLevel: 'silent',
+      onError: onProxyError(apiUrl),
+      secure: false,
+      changeOrigin: true
+    })
+  );
   // Finally, by now we have certainly resolved the URL.
   // It may be /index.html, so let the dev server try serving it again.
   devServer.use(devServer.middleware);
@@ -212,11 +197,12 @@ function runDevServer(host, port, protocol) {
   });
 }
 
+// determine protocol based on env
+const envProtocol = process.env.HTTPS === 'true' ? 'https' : 'http';
+
 function run(port) {
-  var protocol = process.env.HTTPS === 'true' ? "https" : "http";
-  var host = process.env.HOST || 'localhost';
-  setupCompiler(host, port, protocol);
-  runDevServer(host, port, protocol);
+  setupCompiler(process.env.HOST, process.env.PORT, envProtocol);
+  runDevServer(process.env.HOST, process.env.PORT, envProtocol);
 }
 
 // We attempt to use the default port but if it is busy, we offer the user to

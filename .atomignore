@@ -1,0 +1,14 @@
+### used with atom-tree-ignore package to hide files from the file tree shown on the left
+
+.git
+.sass-cache
+node_modules
+npm-debug.log
+
+### hiding to simplify
+build
+config
+public
+scripts
+.eslintrc
+.gitignore

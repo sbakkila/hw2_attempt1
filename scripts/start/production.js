@@ -1,4 +1,3 @@
-import path from 'path';
 import Express from 'express';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -7,7 +6,10 @@ import paths from '../../config/paths';
 const app = Express();
 
 // send API requests to API port
-const apiUrl = `http://${process.env.HOST}:${require(paths.appPackageJson).proxy}`;
+const apiUrl = `${process.env.HTTPS ? 'https' : 'http'}://${process.env.HOST}:${process.env.APIPORT}`;
+
+console.log(apiUrl);
+
 const proxy = httpProxy.createProxyServer({
   target: apiUrl,
 });
@@ -18,7 +20,9 @@ app.use(compression()); // compresses responses
 
 // Proxy API requests to API server
 app.use('/api', (req, res) => {
-  proxy.web(req, res, {target: apiUrl});
+  proxy.web(req, res, {
+    target: apiUrl
+  });
 });
 
 // informs app where base path for static assets is
