@@ -6,5 +6,6 @@
   },
   "rules": {
     "no-empty-label": 0,
+    "no-mixed-operators": 0
   }
 }

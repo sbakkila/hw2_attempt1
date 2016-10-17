@@ -66,13 +66,15 @@
     "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
     "helmet": "^2.3.0",
+    "iso-path-join": "^1.0.6",
     "mongoose": "^4.6.4",
     "morgan-body": "^0.9.5",
     "piping": "^1.0.0-rc.4",
     "postcss-nested": "^1.0.0",
     "pretty-error": "^2.0.2",
     "react": "^15.3.2",
-    "react-dom": "^15.3.2"
+    "react-dom": "^15.3.2",
+    "superagent": "^2.3.0"
   },
   "jest": {
     "moduleFileExtensions": [
