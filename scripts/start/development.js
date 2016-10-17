@@ -1,25 +1,16 @@
-// Load environment variables from .env file. Surpress warnings using silent
-// if this file is missing. dotenv will never modify any environment variables
-// that have already been set.
-// https://github.com/motdotla/dotenv
-require('dotenv').config({ silent: true });
-
-// default NODE_ENV to 'development'
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-
-var chalk = require('chalk');
-var webpack = require('webpack');
-var WebpackDevServer = require('webpack-dev-server');
-var historyApiFallback = require('connect-history-api-fallback');
-var httpProxyMiddleware = require('http-proxy-middleware');
-var detect = require('detect-port');
-var clearConsole = require('react-dev-utils/clearConsole');
-var checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
-var formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
-var openBrowser = require('react-dev-utils/openBrowser');
-var prompt = require('react-dev-utils/prompt');
-var config = require('../config/webpack.config.dev');
-var paths = require('../config/paths');
+import chalk from 'chalk'; // eslint-disable-line
+import webpack from 'webpack';
+import WebpackDevServer from 'webpack-dev-server';
+import historyApiFallback from 'connect-history-api-fallback';
+import httpProxyMiddleware from 'http-proxy-middleware';
+import detect from 'detect-port';
+import clearConsole from 'react-dev-utils/clearConsole';
+import checkRequiredFiles from 'react-dev-utils/checkRequiredFiles';
+import formatWebpackMessages from 'react-dev-utils/formatWebpackMessages';
+import openBrowser from 'react-dev-utils/openBrowser';
+import prompt from 'react-dev-utils/prompt';
+import config from '../../config/webpack.config.dev';
+import paths from '../../config/paths';
 
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
@@ -27,7 +18,6 @@ if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
 }
 
 // Tools like Cloud9 rely on this.
-var DEFAULT_PORT = process.env.PORT || 3000;
 var compiler;
 
 function setupCompiler(host, port, protocol) {
@@ -145,13 +135,8 @@ function addMiddleware(devServer) {
       process.exit(1);
     }
 
-    // Otherwise, if proxy is specified, we will let it handle any request.
-    // There are a few exceptions which we won't send to the proxy:
-    // - /index.html (served as HTML5 history API fallback)
-    // - /*.hot-update.json (WebpackDevServer uses this too for hot reloading)
-    // - /sockjs-node/* (WebpackDevServer uses this for hot reloading)
-    // Tip: use https://jex.im/regulex/ to visualize the regex
-    var mayProxy = /^(?!\/(index\.html$|.*\.hot-update\.json$|sockjs-node\/)).*$/;
+    // proxy routes beginning with API
+    var mayProxy = /^\/api\/.*$/;
     devServer.use(mayProxy,
       // Pass the scope regex both to Express and to the middleware for proxying
       // of both HTTP and WebSockets to work without false positives.
@@ -236,15 +221,15 @@ function run(port) {
 
 // We attempt to use the default port but if it is busy, we offer the user to
 // run on a different port. `detect()` Promise resolves to the next free port.
-detect(DEFAULT_PORT).then(port => {
-  if (port === DEFAULT_PORT) {
+detect(process.env.PORT).then(port => {
+  if (port === process.env.PORT) {
     run(port);
     return;
   }
 
   clearConsole();
   var question =
-    chalk.yellow('Something is already running on port ' + DEFAULT_PORT + '.') +
+    chalk.yellow('Something is already running on port ' + process.env.PORT + '.') +
     '\n\nWould you like to run the app on another port instead?';
 
   prompt(question, true).then(shouldChangePort => {

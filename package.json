@@ -2,9 +2,10 @@
   "name": "introToReact",
   "version": "0.1.0",
   "scripts": {
-    "start": "concurrent --kill-others \"node scripts/start.js\" \"node scripts/server.js\"",
-    "build": "node scripts/build.js",
-    "test": "node scripts/test.js --env=jsdom"
+    "start": "concurrently --kill-others \"node scripts/start\" \"node scripts/server\"",
+    "prod": "cross-env NODE_ENV=production concurrently --kill-others \"node scripts/start\" \"node scripts/server\"",
+    "build": "node scripts/build",
+    "test": "node scripts/test --env=jsdom"
   },
   "devDependencies": {
     "autoprefixer": "6.4.1",
@@ -64,6 +65,7 @@
     "concurrently": "^3.1.0",
     "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
+    "helmet": "^2.3.0",
     "piping": "^1.0.0-rc.4",
     "postcss-nested": "^1.0.0",
     "react": "^15.3.2",
@@ -92,9 +94,6 @@
     "presets": [
       "react-app"
     ]
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   },
   "proxy": "http://localhost:3001/"
 }

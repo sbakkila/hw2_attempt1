@@ -1,0 +1,10 @@
+{
+  "extends": "react-app",
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "rules": {
+    "no-empty-label": 0,
+  }
+}
