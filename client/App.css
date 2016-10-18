@@ -8,8 +8,9 @@ body {
 
 body {
   font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
-  background-color: #ecf1f1;
-  color: #332f2b;
+  font-weight: 100;
+  background-color: whitesmoke;
+  color: teal;
 }
 
 li {
