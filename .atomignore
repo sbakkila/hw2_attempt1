@@ -9,5 +9,5 @@ npm-debug.log
 build
 config
 scripts
-# .eslintrc
+.eslintrc
 .gitignore
