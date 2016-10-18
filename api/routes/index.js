@@ -1,48 +1,36 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
-// pull message model off mongoose, works because Node uses singletons for imports/requires!!!
-const Message = mongoose.model('Message');
+// blog post model
+const Post = mongoose.model('Post');
 
 
 export default router => {
-  // get all messages
-  router.get('/', (req, res, next) =>
-    Message.find({}, null, { sort: '-createdDate' })
-      .then(allMessages => res.json(allMessages))
-      .catch(next)
-  );
 
-  // get specific message
-  router.get('/message/:id', (req, res, next) =>
-    Message.findById(req.params.id)
-      .then(specificMessage => res.json(specificMessage))
-      .catch(next)
-  );
-
-  // save a message
-  router.post('/message/:messageString', (req, res, next) => {
-    const newMessage = new Message({ content: req.params.messageString });
-    newMessage.save()
-      .then(savedMessage => res.json(savedMessage))
-      .catch(next);
+  // Get initial app data
+  router.get('/post', function(req, res, next) {
+    Post.find({}, null, {sort:'-createdDate'})
+      .then(allPosts => res.json(allPosts))
+      .catch(err => !console.log(err) && next(err)); // pass DB errors to Express error handler
   });
 
-  // update a message
-  router.put('/message/:id/:newMessageString', (req, res, next) =>
-    // new option here says return the updated object to the following promise
-    Message.findByIdAndUpdate(req.params.id, {
-      content: req.params.newMessageString,
-    }, { new: true })
-      .then(updatedMessage => res.status(200).json(updatedMessage))
-      .catch(next)
-  );
+  router.post('/post', function(req, res, next) {
+    const newPost = new Post(req.body);
+    newPost.save()
+      .then(savedPost => res.json(savedPost[0] || savedPost)) // sometimes returns array of [savedPost, 1], not sure if this a MongoDB or Mongoose version thing
+      .catch(err => !console.log(err) && next(err)); // pass DB errors to Express error handler
+  });
 
-  // delete a message
-  router.delete('/message/:id', (req, res, next) =>
-    Message.findByIdAndRemove(req.params.id)
-      .then(deletedMessage => res.status(200).json(deletedMessage))
-      .catch(next)
-  );
+  router.put('/post/:id', function(req, res, next) {
+    Post.findByIdAndUpdate(req.params.id, req.body, { new:true }) // new option here says return the updated object to the following promise, vs. object prior to update
+      .then(updatedPost => res.status(200).json(updatedPost))
+      .catch(err => !console.log(err) && next(err)); // pass DB errors to Express error handler
+  });
+
+  router.delete('/post/:id', function(req, res, next) {
+    Post.findByIdAndRemove(req.params.id)
+      .then(deletedPost => res.status(200).json(deletedPost))
+      .catch(err => !console.log(err) && next(err)); // pass DB errors to Express error handler
+  });
 
   return router;
 }

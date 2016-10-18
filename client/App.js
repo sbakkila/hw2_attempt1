@@ -1,6 +1,6 @@
 // Component here uses ES6 destructuring syntax in import, what is means is "retrieve the property 'Component' off of the object exported from the 'react'"
 import React, { Component } from 'react';
-import ajax from './utils/ajax';
+import request from './utils/request';
 
 // other components
 import Navbar from './Navbar';
@@ -10,20 +10,18 @@ import Blog from './Blog';
 import './App.css';
 
 class App extends Component {
-  state = {}
+  state = {
+    posts: []
+  }
 
   componentDidMount() {
     // retrieve app initialization data once root component has mounted
-    Promise.all([
-      ajax.get('/auth/session'),
-      ajax.get('/api/post')
-    ])
-    .then(([user, posts]) => {
-      this.setState({
-        user: user || null,
-        posts: posts.sort((a,b) => Date.parse(b.createdDate) - Date.parse(a.createdDate))
-      });
-    }).catch(err => console.log(err));
+    request.get('/api/post')
+      .then(res =>
+        this.setState({
+          posts: res.data.sort((a,b) => b.createdDate - a.createdDate) // sort posts newest to oldest
+        })
+      ).catch(err => console.log(err));
   }
 
   addPost = postState => {
@@ -32,28 +30,17 @@ class App extends Component {
       body: postState.body
     };
 
-    // Adding authed properties if user is logged in
-    if(this.state.user) postBody.email = this.state.user.email;
-    if(this.state.user && this.state.user.google && this.state.user.google.photo) {
-      postBody.photo = this.state.user.google.photo;
-      postBody.google_link = this.state.user.google.link;
-    }
-    if(this.state.user && this.state.user.facebook && this.state.user.facebook.photo) {
-      postBody.photo = this.state.user.facebook.photo;
-      postBody.facebook_link = this.state.user.facebook.link;
-    }
-
-    ajax.post({
+    request.post({
       route: '/api/post',
       body: postBody
-    }).then(res => this.setState({
-      posts: this.state.posts.unshift(res) && this.state.posts
+    }).then(res => !console.log(res.data) && this.setState({
+      posts: [res.data].concat(this.state.posts)
     }));
   };
 
   updatePost = (postState, id) => {
     const index = postState.editIndex;
-    ajax.put({
+    request.put({
       route: `/api/post/${this.state.posts[index]._id}`,
       body: {
         title: postState.title,
@@ -61,50 +48,24 @@ class App extends Component {
         createdDate: new Date()
       }
     }).then(res => {
-      const newPosts = this.state.posts.slice();
-      newPosts[index] = res;
+      const newPosts = this.state.posts.slice(); // removes reference to old array (arrays are objects!)
+      newPosts[index] = res.data;
       this.setState({
-        posts: this.state.posts.slice()
+        posts: newPosts
       });
     });
   };
 
   deletePost = id =>
-    ajax.del(`/api/post/${id}`)
+    request.delete(`/api/post/${id}`)
       .then(res => this.setState({
-        posts: this.state.posts.filter(val => val._id !== id)
+        posts: this.state.posts.filter(val => val._id !== id) // filter deleted id out of state
       }));
-
-  localAuth = (email, password) => {
-    ajax.post({
-      route: '/auth/login',
-      body: {
-        email: email || this.state.user.email, //the "or" handles if they're already authedand are adding a password to their account
-        password: password
-      }
-    }).then(user => {
-      this.setState({
-        user
-      });
-    });
-  };
-
-  logout = () => {
-    ajax.get('/auth/logout')
-      .then(() =>
-        this.setState({
-          user: null
-        }));
-  };
 
   render() {
     return (
       <div>
-        <Navbar
-          user={this.state.user}
-          localAuth={this.localAuth}
-          logout={this.logout}
-        />
+        <Navbar />
         <Blog
           posts={this.state.posts}
           userEmail={this.state.user && this.state.user.email}
