@@ -6,6 +6,7 @@ import request from './utils/request';
 import Navbar from './Navbar';
 import Blog from './Blog';
 
+
 // this will bring this CSS file into build
 import './App.css';
 
@@ -68,7 +69,6 @@ class App extends Component {
         <Navbar />
         <Blog
           posts={this.state.posts}
-          userEmail={this.state.user && this.state.user.email}
           addPost={this.addPost}
           updatePost={this.updatePost}
           deletePost={this.deletePost}

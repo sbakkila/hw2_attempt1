@@ -8,6 +8,34 @@ export default class BlogPost extends Component {
   delete = this.props.delete.bind(this, this.props.post._id);
   edit = this.props.edit.bind(this, this.props.post, this.props.index);
 
+  componentWillMount() {
+    console.log('hello first', this.props.post.title);
+  }
+
+  componentDidMount() {
+    console.log('hello', this.props.post.title);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log('hello again first... really', nextProps.title);
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return true;
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    console.log('hello again first', this.props.post.title);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    console.log('hello again', this.props.post.title);
+  }
+
+  componentWillUnmount() {
+    console.log('goodbye', this.props.post.title);
+  }
+
   render() {
     return (
       <li className="blog-post">
@@ -15,39 +43,6 @@ export default class BlogPost extends Component {
         <p className="blog-body">{this.props.post.body}</p>
         <p className="blog-created-date">{prettyDate(this.props.post.createdDate)}</p>
         {
-          this.props.post.photo
-          &&
-          <img
-            className="author-photo"
-            alt={this.props.post.email}
-            src={this.props.post.photo}
-          />
-        }
-        {
-          this.props.post.email
-          &&
-          <span className="author-email">
-            {this.props.post.email}
-          </span>
-        }
-        {
-          this.props.post.google_link
-          &&
-          <a href={this.props.post.google_link} className="author-google">
-            <i className="fa fa-google o-auth-btn"/>
-          </a>
-        }
-        {
-          this.props.post.facebook_link
-          &&
-          <a href={this.props.post.facebook_link} className="author-facebook">
-            <i className="fa fa-facebook o-auth-btn"/>
-          </a>
-        }
-        {
-          // Conditional logic to hide update button if another user logged in and made that post (anonymous posts can be editted by anyone)
-          (!this.props.post.email || this.props.post.email === this.props.userEmail)
-          &&
           <div>
             <button className="delete-post" onClick={this.delete}>Delete Post</button>
             <button className="update-post" onClick={this.edit}>Update Post</button>
