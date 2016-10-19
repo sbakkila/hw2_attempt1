@@ -14,14 +14,14 @@ process.env.APIPORT = process.env.APIPORT || 3001;
 require('babel-core/register');
 
 // handles live node reloads
-// if (process.env.NODE_ENV === 'development') {
-//   if (!require('piping')({
-//     hook: true,
-//     ignore: /(\/\.|~$|\.json$)/i
-//   })) {
-//     return;
-//   }
-// }
+if (process.env.NODE_ENV === 'development') {
+  if (!require('piping')({
+    hook: true,
+    ignore: /(\/\.|~$|\.json$)/i
+  })) {
+    return;
+  }
+}
 
 // actually start app
 require('../api')

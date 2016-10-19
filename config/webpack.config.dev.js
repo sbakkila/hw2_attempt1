@@ -1,5 +1,5 @@
 var autoprefixer = require('autoprefixer');
-var postcssNested = require('postcss-nested');
+var postCssNested = require('postcss-nested');
 var webpack = require('webpack');
 var findCacheDir = require('find-cache-dir');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -180,7 +180,7 @@ module.exports = {
           'not ie < 9', // React doesn't support IE8 anyway
         ]
       }),
-      postcssNested,
+      postCssNested,
     ];
   },
   plugins: [
